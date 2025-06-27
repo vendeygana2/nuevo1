@@ -121,35 +121,27 @@
       const data = Object.fromEntries(formData.entries());
 
       fetch(scriptURL, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(response => response.json())
-      .then(res => {
-        const mensajeDiv = document.getElementById('mensaje');
-        mensajeDiv.style.display = 'block';
-        if (res.estado === "ok") {
-          mensajeDiv.style.backgroundColor = "#d4edda";
-          mensajeDiv.style.color = "#155724";
-          mensajeDiv.innerHTML = `
-            <strong>¡Compra exitosa!</strong><br/>
-            Usuario: <code>${res.usuario}</code><br/>
-            Contraseña: <code>${res.contraseña}</code>
-          `;
-        } else {
-          mensajeDiv.style.backgroundColor = "#f8d7da";
-          mensajeDiv.style.color = "#721c24";
-          mensajeDiv.innerText = res.mensaje;
-        }
-      })
-      .catch(() => {
-        const mensajeDiv = document.getElementById('mensaje');
-        mensajeDiv.style.display = 'block';
-        mensajeDiv.style.backgroundColor = "#f8d7da";
-        mensajeDiv.style.color = "#721c24";
-        mensajeDiv.innerText = "Error al enviar la solicitud.";
-      });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    cedula: cedula,
+    telefono: telefono,
+    tipoCuenta: tipoCuenta,
+    servicio: servicioActivo
+  })
+})
+.then(response => response.text())
+.then(data => {
+  alert("✅ " + data);
+})
+.catch(error => {
+  console.error("Error:", error);
+  alert("⚠️ Error al enviar la solicitud.");
+});
+
+
     });
   </script>
 </body>
