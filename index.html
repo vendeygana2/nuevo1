@@ -1,0 +1,37 @@
+<form id="compraForm">
+  <input type="text" name="cedula" placeholder="Tu cédula" required />
+  <select name="plataforma">
+    <option value="Netflix">Netflix</option>
+    <option value="Amazon">Amazon</option>
+  </select>
+  <button type="submit">Comprar</button>
+</form>
+
+<div id="respuesta"></div>
+
+<script>
+document.getElementById("compraForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const data = {
+    cedula: e.target.cedula.value,
+    plataforma: e.target.plataforma.value,
+  };
+
+  fetch("https://script.google.com/macros/s/AKfycbxS61WN9afMGhNe5sE1fVYHCqDhaEIDKF5lGXZswvtTdY5mUYFhna0in1FrsyYRhRh_/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+    .then(res => res.json())
+    .then(respuesta => {
+      document.getElementById("respuesta").innerHTML =
+        `<p><strong>Cuenta entregada:</strong></p>
+         <p>Usuario: ${respuesta.usuario}</p>
+         <p>Contraseña: ${respuesta.contraseña}</p>`;
+    })
+    .catch(err => {
+      document.getElementById("respuesta").innerText = "Error: " + err;
+    });
+});
+</script>
+
