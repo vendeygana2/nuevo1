@@ -1,43 +1,84 @@
-<form id="compraForm">
-  <input type="text" name="cedula" placeholder="Tu cédula" required />
-  <select name="plataforma">
-    <option value="Netflix">Netflix</option>
-    <option value="Amazon">Amazon</option>
-  </select>
-  <button type="submit">Comprar</button>
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema Streaming</title>
+</head>
+<body>
+  <h2>Verificar Usuario</h2>
+  <input type="text" id="cedula" placeholder="Ingresa tu cédula">
+  <button onclick="verificarUsuario()">Verificar</button>
 
-<div id="respuesta"></div>
+  <div id="registro" style="display:none;">
+    <input type="text" id="nombre" placeholder="Nombre">
+    <input type="text" id="telefono" placeholder="Teléfono">
+    <input type="number" id="saldo" placeholder="Saldo inicial">
+    <button onclick="registrarUsuario()">Registrar</button>
+  </div>
 
-<script>
-document.getElementById("compraForm").addEventListener("submit", function(e) {
-  e.preventDefault();
+  <div id="servicios" style="display:none;">
+    <h3>Servicios disponibles:</h3>
+    <button onclick="comprar('Netflix')">Netflix</button>
+    <button onclick="comprar('Amazon')">Amazon</button>
+    <button onclick="comprar('Disney')">Disney</button>
+    <button onclick="comprar('MAX')">MAX</button>
+  </div>
 
-  const data = {
-    cedula: e.target.cedula.value,
-    plataforma: e.target.plataforma.value,
-  };
+  <div id="respuesta"></div>
 
-  fetch("https://script.google.com/macros/s/AKfycbxS61WN9afMGhNe5sE1fVYHCqDhaEIDKF5lGXZswvtTdY5mUYFhna0in1FrsyYRhRh_/exec", {
-    method: "POST",
-    body: JSON.stringify(data),
-  })
-    
-.then(res => res.json())
-.then(respuesta => {
-  if (respuesta.error) {
-    document.getElementById("respuesta").innerHTML = `<p style="color:red;">${respuesta.error}</p>`;
-  } else {
-    document.getElementById("respuesta").innerHTML =
-      `<p><strong>Cuenta entregada:</strong></p>
-       <p>Usuario: ${respuesta.usuario}</p>
-       <p>Contraseña: ${respuesta.contraseña}</p>`;
-  }
-})
+  <script>
+    let cedulaGlobal = "";
 
-    .catch(err => {
-      document.getElementById("respuesta").innerText = "Error: " + err;
-    });
-});
-</script>
+    function verificarUsuario() {
+      const cedula = document.getElementById("cedula").value;
+      cedulaGlobal = cedula;
 
+      fetch('TU_URL_DEL_SCRIPT', {
+        method: "POST",
+        body: JSON.stringify({ cedula, accion: "verificar" })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.registrado) {
+          document.getElementById("servicios").style.display = "block";
+        } else {
+          document.getElementById("registro").style.display = "block";
+        }
+      });
+    }
+
+    function registrarUsuario() {
+      const nombre = document.getElementById("nombre").value;
+      const telefono = document.getElementById("telefono").value;
+      const saldo = document.getElementById("saldo").value;
+
+      fetch('https://script.google.com/macros/s/AKfycbxS61WN9afMGhNe5sE1fVYHCqDhaEIDKF5lGXZswvtTdY5mUYFhna0in1FrsyYRhRh_/exec', {
+        method: "POST",
+        body: JSON.stringify({ cedula: cedulaGlobal, nombre, telefono, saldo, accion: "registrar" })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.registrado) {
+          document.getElementById("registro").style.display = "none";
+          document.getElementById("servicios").style.display = "block";
+        }
+      });
+    }
+
+    function comprar(servicio) {
+      fetch('TU_URL_DEL_SCRIPT', {
+        method: "POST",
+        body: JSON.stringify({ cedula: cedulaGlobal, servicio, accion: "comprar" })
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.error) {
+          document.getElementById("respuesta").innerHTML = `<p style="color:red">${res.error}</p>`;
+        } else {
+          document.getElementById("respuesta").innerHTML = `<p><strong>${res.servicio}</strong><br>Usuario: ${res.usuario}<br>Contraseña: ${res.contraseña}</p>`;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
