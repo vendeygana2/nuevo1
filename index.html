@@ -22,6 +22,7 @@ document.getElementById("compraForm").addEventListener("submit", function(e) {
     method: "POST",
     body: JSON.stringify(data),
   })
+    
 .then(res => res.json())
 .then(respuesta => {
   if (respuesta.error) {
@@ -33,7 +34,6 @@ document.getElementById("compraForm").addEventListener("submit", function(e) {
        <p>Contraseña: ${respuesta.contraseña}</p>`;
   }
 })
-
 
     .catch(err => {
       document.getElementById("respuesta").innerText = "Error: " + err;
