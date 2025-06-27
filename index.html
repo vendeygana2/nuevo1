@@ -1,147 +1,117 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sistema de Ventas</title>
+  <meta charset="UTF-8">
+  <title>Compra tu cuenta digital</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
     body {
-      background: linear-gradient(to bottom, #1e1e2f, #3b3b5c);
-      color: #fff;
+      background: linear-gradient(to bottom, #1c1c36, #232343);
+      font-family: Arial, sans-serif;
+      color: white;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      padding: 20px;
+      height: 100vh;
+      margin: 0;
     }
-    h1 {
-      margin-bottom: 20px;
-      font-size: 28px;
+    .form-container {
+      background-color: #2c2c4d;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      width: 300px;
+    }
+    h2 {
       text-align: center;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 15px;
-      width: 100%;
-      max-width: 500px;
-    }
-    .servicio {
-      background-color: #ffffff10;
-      padding: 15px;
-      border-radius: 15px;
-      text-align: center;
-      cursor: pointer;
-      border: 1px solid #ffffff22;
-      transition: background 0.3s;
-    }
-    .servicio:hover {
-      background-color: #ffffff25;
-    }
-    #formulario, #mensaje {
-      width: 100%;
-      max-width: 400px;
-      margin-top: 30px;
-      background: #ffffff10;
-      padding: 20px;
-      border-radius: 15px;
-      display: none;
-    }
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-size: 14px;
     }
     input, select, button {
       width: 100%;
-      margin-bottom: 15px;
       padding: 10px;
-      border-radius: 8px;
+      margin: 8px 0;
+      border-radius: 5px;
       border: none;
-      font-size: 16px;
     }
     button {
-      background-color: #00c896;
+      background-color: #00d39e;
       color: white;
       font-weight: bold;
       cursor: pointer;
     }
-    #mensaje {
+    .message {
+      margin-top: 10px;
+      padding: 10px;
       text-align: center;
-      padding: 15px;
+      border-radius: 5px;
+    }
+    .success {
+      background-color: #2ecc71;
+    }
+    .error {
+      background-color: #e74c3c;
     }
   </style>
 </head>
 <body>
-
-  <h1>Compra tu cuenta digital</h1>
-
-  <div class="grid">
-    <div class="servicio" onclick="mostrarFormulario('Netflix')">Netflix</div>
-    <div class="servicio" onclick="mostrarFormulario('Amazon')">Amazon</div>
-    <div class="servicio" onclick="mostrarFormulario('Disney')">Disney</div>
-  </div>
-
-  <div id="formulario">
-    <h3>Formulario de Compra</h3>
-    <form id="formCompra">
-      <input type="hidden" name="servicio" id="servicio" />
-      <label>Cédula:
-        <input type="text" name="cedula" required />
-      </label>
-      <label>Teléfono:
-        <input type="text" name="telefono" required />
-      </label>
-      <label>Tipo de Cuenta:
-        <select name="tipoCuenta" required>
-          <option>Cuenta Completa</option>
-          <option>Pantalla</option>
-          <option>Perfil</option>
-        </select>
-      </label>
+  <div class="form-container">
+    <h2>Compra tu cuenta digital</h2>
+    <form id="compraForm">
+      <input type="text" id="cedula" placeholder="Cédula" required>
+      <input type="text" id="telefono" placeholder="Teléfono" required>
+      <select id="servicio" required>
+        <option value="">Selecciona Servicio</option>
+        <option value="Netflix">Netflix</option>
+        <option value="Amazon">Amazon</option>
+        <option value="Disney">Disney</option>
+        <option value="Max">Max</option>
+        <option value="Flujotv">Flujotv</option>
+      </select>
+      <select id="tipoCuenta" required>
+        <option value="">Tipo de Cuenta</option>
+        <option value="Pantalla">Pantalla</option>
+        <option value="Perfil">Perfil</option>
+        <option value="Cuenta Completa">Cuenta Completa</option>
+      </select>
       <button type="submit">Comprar</button>
     </form>
+    <div id="mensaje" class="message" style="display:none;"></div>
   </div>
 
-  <div id="mensaje"></div>
+  <!-- Formulario oculto para enviar a Google Forms -->
+  <form id="googleForm" action="https://docs.google.com/forms/d/e/1FAIpQLSdWlcN8_zqNwoan_y1rwHaELW-jZsTmSdmll9z3grdxCPqmIg/formResponse" method="POST" target="hidden_iframe" style="display:none;">
+    <input name="entry.1421455911" id="gCedula">
+    <input name="entry.1423681072" id="gTelefono">
+    <input name="entry.877637473" id="gServicio">
+    <input name="entry.866749294" id="gTipoCuenta">
+  </form>
+  <iframe name="hidden_iframe" style="display:none;"></iframe>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbz6IEAX2Q1f8k1XiGHEhebWX9-u_Hh5VHxzzgny1vlBy0bnow6_qsj59E4iQCQP26lk/exec";
+    const compraForm = document.getElementById('compraForm');
+    const googleForm = document.getElementById('googleForm');
+    const mensaje = document.getElementById('mensaje');
 
-    function mostrarFormulario(servicio) {
-      document.getElementById('formulario').style.display = 'block';
-      document.getElementById('servicio').value = servicio;
-      document.getElementById('mensaje').style.display = 'none';
-    }
-
-    document.getElementById('formCompra').addEventListener('submit', function(e) {
+    compraForm.addEventListener('submit', function(e) {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData.entries());
 
-      fetch(scriptURL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    cedula: cedula,
-    telefono: telefono,
-    tipoCuenta: tipoCuenta,
-    servicio: servicioActivo
-  })
-})
-.then(response => response.text())
-.then(data => {
-  alert("✅ " + data);
-})
-.catch(error => {
-  console.error("Error:", error);
-  alert("⚠️ Error al enviar la solicitud.");
-});
+      // Copiar datos al formulario oculto
+      document.getElementById('gCedula').value = document.getElementById('cedula').value;
+      document.getElementById('gTelefono').value = document.getElementById('telefono').value;
+      document.getElementById('gServicio').value = document.getElementById('servicio').value;
+      document.getElementById('gTipoCuenta').value = document.getElementById('tipoCuenta').value;
 
+      // Enviar el formulario
+      googleForm.submit();
 
+      // Mostrar mensaje
+      mensaje.style.display = 'block';
+      mensaje.className = 'message success';
+      mensaje.innerText = '¡Solicitud enviada con éxito! Pronto recibirás tu cuenta.';
+      compraForm.reset();
+
+      // Ocultar mensaje luego de 5 segundos
+      setTimeout(() => {
+        mensaje.style.display = 'none';
+      }, 5000);
     });
   </script>
 </body>
