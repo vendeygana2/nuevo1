@@ -23,12 +23,17 @@ document.getElementById("compraForm").addEventListener("submit", function(e) {
     body: JSON.stringify(data),
   })
     .then(res => res.json())
-    .then(respuesta => {
-      document.getElementById("respuesta").innerHTML =
-        `<p><strong>Cuenta entregada:</strong></p>
-         <p>Usuario: ${respuesta.usuario}</p>
-         <p>Contraseña: ${respuesta.contraseña}</p>`;
-    })
+.then(respuesta => {
+  if (respuesta.error) {
+    document.getElementById("respuesta").innerHTML = `<p style="color:red;">${respuesta.error}</p>`;
+  } else {
+    document.getElementById("respuesta").innerHTML =
+      `<p><strong>Cuenta entregada:</strong></p>
+       <p>Usuario: ${respuesta.usuario}</p>
+       <p>Contraseña: ${respuesta.contraseña}</p>`;
+  }
+})
+
     .catch(err => {
       document.getElementById("respuesta").innerText = "Error: " + err;
     });
