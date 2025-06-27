@@ -1,146 +1,177 @@
+import os
+import zipfile
+
+# Volver a crear el archivo HTML después del reinicio
+html_code = """
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Sistema Streaming</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistema de Ventas</title>
   <style>
-    .servicios-grid {
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+    body {
+      background: linear-gradient(to bottom, #1e1e2f, #3b3b5c);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      text-align: center;
+    }
+    .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
-      margin-top: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+      width: 100%;
+      max-width: 500px;
     }
-
-    .servicio-boton {
-      border: none;
-      background-color: white;
-      padding: 10px;
-      border-radius: 12px;
+    .servicio {
+      background-color: #ffffff10;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
+      border: 1px solid #ffffff22;
+      transition: background 0.3s;
     }
-
-    .servicio-boton:hover {
-      transform: scale(1.05);
+    .servicio:hover {
+      background-color: #ffffff25;
     }
-
-    .servicio-boton img {
-      max-width: 100%;
-      height: 50px;
-      object-fit: contain;
+    #formulario, #mensaje {
+      width: 100%;
+      max-width: 400px;
+      margin-top: 30px;
+      background: #ffffff10;
+      padding: 20px;
+      border-radius: 15px;
+      display: none;
+    }
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    input, select, button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      background-color: #00c896;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #mensaje {
+      text-align: center;
+      padding: 15px;
     }
   </style>
 </head>
 <body>
-  <h2>Verificar Usuario</h2>
-  <input type="text" id="cedula" placeholder="Ingresa tu cédula">
-  <button onclick="verificarUsuario()">Verificar</button>
 
-  <div id="registro" style="display:none;">
-    <input type="text" id="nombre" placeholder="Nombre">
-    <input type="text" id="telefono" placeholder="Teléfono">
-    <input type="number" id="saldo" placeholder="Saldo inicial">
-    <button onclick="registrarUsuario()">Registrar</button>
+  <h1>Compra tu cuenta digital</h1>
+
+  <div class="grid">
+    <div class="servicio" onclick="mostrarFormulario('Netflix')">Netflix</div>
+    <div class="servicio" onclick="mostrarFormulario('Amazon')">Amazon</div>
+    <div class="servicio" onclick="mostrarFormulario('Disney')">Disney</div>
   </div>
 
-  <div id="servicios" style="display:none;">
-    <h3>Servicios disponibles:</h3>
-    <div class="servicios-grid">
-      <button class="servicio-boton" onclick="comprar('Netflix')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
-      </button>
-      <button class="servicio-boton" onclick="comprar('Prime Video')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Prime_Video.png" alt="Prime Video">
-      </button>
-      <button class="servicio-boton" onclick="comprar('Disney+')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/3/3e/Disney%2B_logo.svg" alt="Disney+">
-      </button>
-      <button class="servicio-boton" onclick="comprar('MAX')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Max_Logo_Purple.svg" alt="MAX">
-      </button>
-      <button class="servicio-boton" onclick="comprar('Crunchyroll')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/60/Crunchyroll_Logo.svg" alt="Crunchyroll">
-      </button>
-      <button class="servicio-boton" onclick="comprar('VIX')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Vix_logo.svg" alt="VIX">
-      </button>
-      <button class="servicio-boton" onclick="comprar('Rakuten VIKI')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/Viki_logo.svg" alt="Rakuten VIKI">
-      </button>
-      <button class="servicio-boton" onclick="comprar('TeleLatino')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/9/98/TeleLatino_Logo.png" alt="Tele Latino">
-      </button>
-      <button class="servicio-boton" onclick="comprar('Apple TV')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Apple_TV_Plus_Logo.svg" alt="Apple TV+">
-      </button>
-      <button class="servicio-boton" onclick="comprar('Paramount+')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Paramount%2B_logo.svg" alt="Paramount+">
-      </button>
-      <button class="servicio-boton" onclick="comprar('Plex')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/89/Plex_logo_2022.svg" alt="Plex">
-      </button>
-      <button class="servicio-boton" onclick="comprar('PanaXstreaming')">
-        <img src="https://yourdomain.com/logo-panaxtreaming.png" alt="PanaXstreaming">
-      </button>
-    </div>
+  <div id="formulario">
+    <h3>Formulario de Compra</h3>
+    <form id="formCompra">
+      <input type="hidden" name="servicio" id="servicio" />
+      <label>Cédula:
+        <input type="text" name="cedula" required />
+      </label>
+      <label>Teléfono:
+        <input type="text" name="telefono" required />
+      </label>
+      <label>Tipo de Cuenta:
+        <select name="tipoCuenta" required>
+          <option>Cuenta Completa</option>
+          <option>Pantalla</option>
+          <option>Perfil</option>
+        </select>
+      </label>
+      <button type="submit">Comprar</button>
+    </form>
   </div>
 
-  <div id="respuesta"></div>
+  <div id="mensaje"></div>
 
   <script>
-    let cedulaGlobal = "";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyDj_Wgy-zhkKt3bKFMRiKZLUra4id3eNJWh6Y0_h3E2f0UVWb9jYh9H_0w7y-cpMvA/exec";
 
-    function verificarUsuario() {
-      const cedula = document.getElementById("cedula").value;
-      cedulaGlobal = cedula;
+    function mostrarFormulario(servicio) {
+      document.getElementById('formulario').style.display = 'block';
+      document.getElementById('servicio').value = servicio;
+      document.getElementById('mensaje').style.display = 'none';
+    }
 
-      fetch('https://script.google.com/macros/s/AKfycbxS61WN9afMGhNe5sE1fVYHCqDhaEIDKF5lGXZswvtTdY5mUYFhna0in1FrsyYRhRh_/exec', {
-        method: "POST",
-        body: JSON.stringify({ cedula, accion: "verificar" })
+    document.getElementById('formCompra').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      fetch(scriptURL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
       })
-      .then(r => r.json())
+      .then(response => response.json())
       .then(res => {
-        if (res.registrado) {
-          document.getElementById("servicios").style.display = "block";
+        const mensajeDiv = document.getElementById('mensaje');
+        mensajeDiv.style.display = 'block';
+        if (res.estado === "ok") {
+          mensajeDiv.style.backgroundColor = "#d4edda";
+          mensajeDiv.style.color = "#155724";
+          mensajeDiv.innerHTML = `
+            <strong>¡Compra exitosa!</strong><br/>
+            Usuario: <code>${res.usuario}</code><br/>
+            Contraseña: <code>${res.contraseña}</code>
+          `;
         } else {
-          document.getElementById("registro").style.display = "block";
+          mensajeDiv.style.backgroundColor = "#f8d7da";
+          mensajeDiv.style.color = "#721c24";
+          mensajeDiv.innerText = res.mensaje;
         }
-      });
-    }
-
-    function registrarUsuario() {
-      const nombre = document.getElementById("nombre").value;
-      const telefono = document.getElementById("telefono").value;
-      const saldo = document.getElementById("saldo").value;
-
-      fetch('TU_URL_DEL_SCRhttps://script.google.com/macros/s/AKfycbxS61WN9afMGhNe5sE1fVYHCqDhaEIDKF5lGXZswvtTdY5mUYFhna0in1FrsyYRhRh_/execPT', {
-        method: "POST",
-        body: JSON.stringify({ cedula: cedulaGlobal, nombre, telefono, saldo, accion: "registrar" })
       })
-      .then(r => r.json())
-      .then(res => {
-        if (res.registrado) {
-          document.getElementById("registro").style.display = "none";
-          document.getElementById("servicios").style.display = "block";
-        }
+      .catch(() => {
+        const mensajeDiv = document.getElementById('mensaje');
+        mensajeDiv.style.display = 'block';
+        mensajeDiv.style.backgroundColor = "#f8d7da";
+        mensajeDiv.style.color = "#721c24";
+        mensajeDiv.innerText = "Error al enviar la solicitud.";
       });
-    }
-
-    function comprar(servicio) {
-      fetch('https://script.google.com/macros/s/AKfycbxS61WN9afMGhNe5sE1fVYHCqDhaEIDKF5lGXZswvtTdY5mUYFhna0in1FrsyYRhRh_/exec', {
-        method: "POST",
-        body: JSON.stringify({ cedula: cedulaGlobal, servicio, accion: "comprar" })
-      })
-      .then(r => r.json())
-      .then(res => {
-        if (res.error) {
-          document.getElementById("respuesta").innerHTML = `<p style="color:red">${res.error}</p>`;
-        } else {
-          document.getElementById("respuesta").innerHTML = `<p><strong>${res.servicio}</strong><br>Usuario: ${res.usuario}<br>Contraseña: ${res.contraseña}</p>`;
-        }
-      });
-    }
+    });
   </script>
 </body>
 </html>
+"""
+
+# Crear directorio y archivo
+github_dir = "/mnt/data/SistemaVentas_GitHub"
+os.makedirs(github_dir, exist_ok=True)
+github_html_path = os.path.join(github_dir, "index.html")
+
+with open(github_html_path, "w", encoding="utf-8") as f:
+    f.write(html_code)
+
+# Comprimir en ZIP
+github_zip_path = "/mnt/data/SistemaVentas_GitHubApp.zip"
+with zipfile.ZipFile(github_zip_path, "w") as zipf:
+    zipf.write(github_html_path, arcname="index.html")
+
+github_zip_path
